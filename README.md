@@ -45,20 +45,22 @@ Find all events for a given time range:
 
 ```events = client.all_events("2015-11-18", "2015-11-20")```
 
-#### Event creation
-Create an event : 
+#### Event saving
+Save an event : 
 
-```client.create_event "8DBBD94D-056F-451C-BAD6-83E51D5FFDAB", <<ics
-BEGIN:VEVENT
-CREATED;VALUE=DATE-TIME:20151117T093330Z
-DTEND;TZID=Europe/Berlin;VALUE=DATE-TIME:20151119T133000
-STATUS:CONFIRMED
-DTSTART;TZID=Europe/Berlin;VALUE=DATE-TIME:20151119T123000
-TRANSP:TRANSPARENT
-UID:8DBBD94D-056F-451C-BAD6-83E51D5FFDAB
-SUMMARY:My event title
-SEQUENCE:1
-END:VEVENT
+```
+client.save_event "8DBBD94D-056F-451C-BAD6-83E51D5FFDAB", <<ics
+  BEGIN:VEVENT
+  CREATED;VALUE=DATE-TIME:20151117T093330Z
+  DTEND;TZID=Europe/Berlin;VALUE=DATE-TIME:20151119T133000
+  STATUS:CONFIRMED
+  DTSTART;TZID=Europe/Berlin;VALUE=DATE-TIME:20151119T123000
+  TRANSP:TRANSPARENT
+  UID:8DBBD94D-056F-451C-BAD6-83E51D5FFDAB
+  SUMMARY:My event title
+  SEQUENCE:1
+  END:VEVENT
+ics
 ```
 
 Simply pass as argument, the event uid and its ics string. If the event already exists, it will perform an update.
