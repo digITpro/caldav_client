@@ -2,6 +2,7 @@ A ruby caldav client, only implementing:
 
 * Events fetching
 * Event saving
+* Event deletion
 * Events synch ([see](https://tools.ietf.org/html/rfc4791#section-8.2.1.3))
 
 ## Usage
@@ -64,3 +65,9 @@ ics
 ```
 
 Simply pass as argument, the event uid and its ics string. If the event already exists, it will perform an update.
+
+
+#### Event deletion
+Delete an event
+
+```client.delete_event("8DBBD94D-056F-451C-BAD6-83E51D5FFDAB")```

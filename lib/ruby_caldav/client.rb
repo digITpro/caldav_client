@@ -93,10 +93,10 @@ module RubyCaldav
       RubyCaldav::Parser.parse_events(response.body)
     end
 
-    def find_event(uuid)
+    def find_event(uid)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}/#{uuid}.ics")
+        request = Net::HTTP::Get.new("#{@url}/#{uid}.ics")
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -105,10 +105,10 @@ module RubyCaldav
       RubyCaldav::Parser.parse_event(response.body)
     end
 
-    def delete_event(uuid)
+    def delete_event(uid)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new("#{@url}/#{uuid}.ics")
+        request = Net::HTTP::Delete.new("#{@url}/#{uid}.ics")
         add_auth_header(request, 'DELETE')
         response = http.request(request)
       end
