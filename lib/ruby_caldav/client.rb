@@ -117,47 +117,17 @@ module RubyCaldav
       response.code.to_i.between?(200, 299)
     end
 
-    def create_event(event)
-      calendar = Calendar.new
-      calendar.events = []
-      uuid = UUID.new.generate
-      raise DuplicateError if entry_with_uuid_exists?(uuid)
-      calendar.event do
-        uid uuid
-        dtstart DateTime.parse(event[:start])
-        dtend DateTime.parse(event[:end])
-        categories event[:categories] # Array
-        contacts event[:contacts] # Array
-        attendees event[:attendees] # Array
-        duration event[:duration]
-        summary event[:title]
-        description event[:description]
-        klass event[:accessibility] #PUBLIC, PRIVATE, CONFIDENTIAL
-        location event[:location]
-        geo_location event[:geo_location]
-        status event[:status]
-        url event[:url]
-      end
-      ical_string = calendar.to_ical
+    def save_event(uid, ical_string)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Put.new("#{@url}/#{uuid}.ics")
+        request = Net::HTTP::Put.new("#{@url}/#{uid}.ics")
         request['Content-Type'] = 'text/calendar'
         add_auth_header(request, 'PUT')
         request.body = ical_string
         response = http.request(request)
       end
       handle_errors(response)
-      find_event(uuid)
-    end
-
-    def update_event(event)
-      #TODO... fix me
-      if delete_event(event[:uid])
-        create_event(event)
-      else
-        false
-      end
+      response.code.to_i == 201
     end
 
     def entry_with_uuid_exists?(uuid)
