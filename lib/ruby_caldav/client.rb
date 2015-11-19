@@ -141,7 +141,7 @@ module RubyCaldav
       response.code.to_i == 200
     end
 
-    def create_agenda(display_name = nil, description = nil)
+    def create_calendar(display_name = nil, description = nil)
       response = nil
       build_http.start do |http|
         request = Net::HTTP::Mkcalendar.new("#{@url}/display_name/", initheader = {'Content-Type' => 'application/xml'})
@@ -152,6 +152,18 @@ module RubyCaldav
       handle_errors(response)
       response.code.to_i == 201
     end
+
+    def delete_calendar
+      response = nil
+      build_http.start do |http|
+        request = Net::HTTP::Delete.new(@url)
+        add_auth_header(request, 'DELETE')
+        response = http.request(request)
+      end
+      handle_errors(response)
+      response.code.to_i == 200
+    end
+
     private
 
     def digest_auth(method)
