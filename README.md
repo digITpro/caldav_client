@@ -4,6 +4,7 @@ A ruby caldav client, only implementing:
 * Event saving
 * Event deletion
 * Events synch ([see](https://tools.ietf.org/html/rfc4791#section-8.2.1.3))
+* Calendar creation
 
 ## Usage
 
@@ -47,7 +48,7 @@ Find all events for a given time range:
 ```events = client.all_events("2015-11-18", "2015-11-20")```
 
 #### Event saving
-Save an event : 
+Save an event:
 
 ```
 client.save_event "8DBBD94D-056F-451C-BAD6-83E51D5FFDAB", <<ics
@@ -68,6 +69,14 @@ Simply pass as argument, the event uid and its ics string. If the event already 
 
 
 #### Event deletion
-Delete an event
+Delete an event:
 
 ```client.delete_event("8DBBD94D-056F-451C-BAD6-83E51D5FFDAB")```
+
+#### Calendar creation
+Create a new calendar collection:
+
+```
+client = RubyCaldav::Client.new(uri: "http://localhost:5232/", user: "user" , password: "password")
+client.create_agenda "My agenda displayn name", "My agenda description"
+```
