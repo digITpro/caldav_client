@@ -1,0 +1,4 @@
+caldaver-test.sh
+*.gem
+*.tmp
+.idea
