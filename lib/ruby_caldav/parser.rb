@@ -46,6 +46,17 @@ module RubyCaldav
         events_etag
       end
 
+      def parse_propfind(body)
+        xml = REXML::Document.new(body)
+        properties = {}
+        REXML::XPath.each(xml, "multistatus/response") do |response|
+          response.each_element("propstat/prop/*") do |prop|
+            properties[prop.name] = prop.text
+          end
+        end
+        properties
+      end
+
     end
 
     extend ClassMethods

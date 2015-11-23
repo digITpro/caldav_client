@@ -144,7 +144,7 @@ module RubyCaldav
     def create_calendar(display_name = nil, description = nil)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Mkcalendar.new("#{@url}/display_name/", initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Mkcalendar.new("#{@url}/#{display_name}/", initheader = {'Content-Type' => 'application/xml'})
         add_auth_header(request, 'MKCALENDAR')
         request.body = RubyCaldav::Request::Mkcalendar.new(display_name, description).to_xml
         response = http.request(request)
@@ -162,6 +162,18 @@ module RubyCaldav
       end
       handle_errors(response)
       response.code.to_i == 200
+    end
+
+    def calendar_all_props
+      response = nil
+      build_http.start do |http|
+        request = Net::HTTP::Propfind.new(@url)
+        add_auth_header(request, 'PROPFIND')
+        request.body = RubyCaldav::Request::Propfind.new.basic
+        response = http.request(request)
+      end
+      handle_errors(response)
+      RubyCaldav::Parser.parse_propfind(response.body)
     end
 
     private

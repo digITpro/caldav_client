@@ -1,7 +1,7 @@
 require 'builder'
 
 module RubyCaldav
-  NAMESPACES = {"xmlns:d" => 'DAV:', "xmlns:c" => "urn:ietf:params:xml:ns:caldav"}
+  NAMESPACES = {"xmlns:d" => 'DAV:', "xmlns:c" => "urn:ietf:params:xml:ns:caldav",  "xmlns:cs" => "http://calendarserver.org/ns/"}
   module Request
     class Base
       def initialize
@@ -77,6 +77,21 @@ module RubyCaldav
           end
           events_href.each do |href|
             xml.d :href, href
+          end
+        end
+      end
+    end
+
+    class Propfind < Base
+      def initialize
+        super
+      end
+
+      def basic
+        xml.d :propfind, NAMESPACES do
+          xml.d :prop do
+            xml.d :displayname
+            xml.cs :getctag
           end
         end
       end
