@@ -76,7 +76,7 @@ Delete an event:
 Create a new calendar collection:
 
     client = RubyCaldav::Client.new(uri: "http://localhost:5232/", user: "user" , password: "password")
-    client.create_calendar "My calendar display name", "My calendar description"
+    client.create_calendar "aaa", "My calendar display name", "My calendar description"
 
 #### Calendar deletion
 Delete a calendar collection:
