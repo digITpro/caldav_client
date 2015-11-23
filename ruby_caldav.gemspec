@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require File.expand_path('../lib/agcaldav/version', __FILE__)
+require File.expand_path('../lib/ruby_caldav/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "ruby_caldav"
@@ -13,10 +13,9 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
 
   s.homepage    = %q{https://github.com/digitpro/ruby_caldav}
-  s.authors     = [%q{}]
+  s.authors     = [%q{Digitpro agilastic}]
   s.email       = [%q{}]
   s.add_runtime_dependency 'ri_cal'
-  s.add_runtime_dependency 'uuid'
   s.add_runtime_dependency 'builder'
   s.add_runtime_dependency 'net-http-digest_auth'
   
