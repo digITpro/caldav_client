@@ -93,10 +93,10 @@ module RubyCaldav
       RubyCaldav::Parser.parse_events(response.body)
     end
 
-    def find_event(uid)
+    def find_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}/#{uid}.ics")
+        request = Net::HTTP::Get.new("#{@url}/#{href}")
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -105,10 +105,22 @@ module RubyCaldav
       RubyCaldav::Parser.parse_event(response.body)
     end
 
-    def delete_event(uid)
+    def find_etag(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new("#{@url}/#{uid}.ics")
+        request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        add_auth_header(request, 'REPORT')
+        request.body =  RubyCaldav::Request::ReportVEVENT.new.etag(href)
+        response = http.request(request)
+      end
+      handle_errors(response)
+      RubyCaldav::Parser.parse_etags(response.body)
+    end
+
+    def delete_event(href)
+      response = nil
+      build_http.start do |http|
+        request = Net::HTTP::Delete.new("#{@url}/#{href}")
         add_auth_header(request, 'DELETE')
         response = http.request(request)
       end
@@ -117,10 +129,10 @@ module RubyCaldav
       response.code.to_i.between?(200, 299)
     end
 
-    def save_event(uid, ical_string)
+    def save_event(href, ical_string)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Put.new("#{@url}/#{uid}.ics")
+        request = Net::HTTP::Put.new("#{@url}/#{href}")
         request['Content-Type'] = 'text/calendar'
         add_auth_header(request, 'PUT')
         request.body = ical_string
@@ -130,10 +142,10 @@ module RubyCaldav
       response.code.to_i == 201
     end
 
-    def entry_with_uuid_exists?(uuid)
+    def entry_with_uhref_exists?(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}/#{uuid}.ics")
+        request = Net::HTTP::Get.new("#{@url}/#{href}")
         add_auth_header(request, 'GET')
         response = http.request(request)
       end

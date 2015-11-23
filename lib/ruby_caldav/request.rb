@@ -54,6 +54,15 @@ module RubyCaldav
         end
       end
 
+      def etag(href)
+        xml.c 'calendar-multiget'.to_sym, NAMESPACES do
+          xml.d :prop do
+            xml.d :getetag
+          end
+          xml.d :href, href
+        end
+      end
+
       def all_events(tstart = nil, tend = nil)
         xml.c 'calendar-query'.to_sym, NAMESPACES do
           xml.d :prop do
