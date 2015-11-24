@@ -4,20 +4,23 @@ module RubyCaldav
     module ClassMethods
       def parse_events(body)
         xml = Oga.parse_xml(body)
-        events = []
+        parsed_events = []
 
         xml.xpath("multistatus/response").each do |response|
           href = response.xpath("href").text
           etag = response.xpath("propstat/prop/getetag").text
           event_str = response.xpath("propstat/prop/C:calendar-data").text
           if event_str
-            event = RiCal.parse_string(event_str).first
-            event.add_x_property("HREF", href)
-            event.add_x_property("ETAG", etag)
-            events << event
+            calendars = RiCal.parse_string(event_str)
+            if calendars && (calendar = calendars.first) && (events = calendar.events)
+              event = events.first
+              event.add_x_property("HREF", href)
+              event.add_x_property("ETAG", etag)
+              parsed_events << event
+            end
           end
         end
-        events
+        parsed_events
       end
 
       def parse_event(body)
