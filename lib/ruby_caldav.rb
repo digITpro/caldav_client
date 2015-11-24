@@ -1,7 +1,6 @@
 require 'net/https'
 require 'net/http/digest_auth'
-require 'rexml/document'
-require 'rexml/xpath'
+require 'oga'
 require 'ri_cal'
 require 'time'
 require 'date'

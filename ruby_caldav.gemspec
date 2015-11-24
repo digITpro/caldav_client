@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'ri_cal'
   s.add_runtime_dependency 'builder'
   s.add_runtime_dependency 'net-http-digest_auth'
-  
+  s.add_runtime_dependency 'oga', '~> 1.3'
+
 
 
   s.description = <<-DESC

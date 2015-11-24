@@ -3,21 +3,21 @@ module RubyCaldav
 
     module ClassMethods
       def parse_events(body)
-        xml = REXML::Document.new(body)
-        result = ""
-        REXML::XPath.each(xml, '//c:calendar-data/', {"c" => "urn:ietf:params:xml:ns:caldav"}) { |calendar| result << calendar.text }
-        calendars = RiCal.parse_string(result)
-        if calendars.empty?
-          calendars
-        else
-          events= []
-          calendars.each do |calendar|
-            calendar.events.each do |event|
-              events << event
-            end
+        xml = Oga.parse_xml(body)
+        events = []
+
+        xml.xpath("multistatus/response").each do |response|
+          href = response.xpath("href").text
+          etag = response.xpath("propstat/prop/getetag").text
+          event_str = response.xpath("propstat/prop/C:calendar-data").text
+          if event_str
+            event = RiCal.parse_string(event_str).first
+            event.add_x_property("HREF", href)
+            event.add_x_property("ETAG", etag)
+            events << event
           end
-          events
         end
+        events
       end
 
       def parse_event(body)
@@ -30,27 +30,21 @@ module RubyCaldav
       end
 
       def parse_etags(body)
-        xml = REXML::Document.new(body)
+        xml = Oga.parse_xml(body)
         events_etag = []
-        href_str = ""
-        etag_str = ""
-        REXML::XPath.each(xml, "multistatus/response") do |response|
-          response.each_element("href") do |href|
-            href_str = href.text
-          end
-          response.each_element("propstat/prop/getetag") do |etag|
-            etag_str = etag.text
-          end
+        xml.xpath("multistatus/response").each do |response|
+          href_str = response.xpath("href").text
+          etag_str = response.xpath("propstat/prop/getetag").text
           events_etag << {href: href_str, etag: etag_str}
         end
         events_etag
       end
 
       def parse_propfind(body)
-        xml = REXML::Document.new(body)
+        xml = Oga.parse_xml(body)
         properties = {}
-        REXML::XPath.each(xml, "multistatus/response") do |response|
-          response.each_element("propstat/prop/*") do |prop|
+        xml.xpath("multistatus/response").each do |response|
+          response.xpath("propstat/prop/*").each do |prop|
             properties[prop.name] = prop.text
           end
         end
