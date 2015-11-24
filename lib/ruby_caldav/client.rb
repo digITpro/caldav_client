@@ -71,8 +71,12 @@ module RubyCaldav
       build_http.start do |http|
         request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
         add_auth_header(request, 'REPORT')
-        request.body = RubyCaldav::Request::ReportVEVENT.new.etags(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
-                                                                   Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
+        if start_at && end_at
+          request.body = RubyCaldav::Request::ReportVEVENT.new.etags(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
+                                                                     Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
+        else
+          request.body = RubyCaldav::Request::ReportVEVENT.new.etags
+        end
         response = http.request(request)
       end
       handle_errors(response)
@@ -110,7 +114,7 @@ module RubyCaldav
       build_http.start do |http|
         request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
         add_auth_header(request, 'REPORT')
-        request.body =  RubyCaldav::Request::ReportVEVENT.new.etag(href)
+        request.body = RubyCaldav::Request::ReportVEVENT.new.etag(href)
         response = http.request(request)
       end
       handle_errors(response)
