@@ -82,6 +82,7 @@ module RubyCaldav
       def events(events_href)
         xml.c 'calendar-multiget'.to_sym, NAMESPACES do
           xml.d :prop do
+            xml.d :getetag
             xml.c 'calendar-data'.to_sym
           end
           events_href.each do |href|
