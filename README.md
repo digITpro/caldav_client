@@ -83,3 +83,11 @@ Delete a calendar collection:
 
     client = RubyCaldav::Client.new(uri: "http://localhost:5232/aaa/", user: "user" , password: "password")
     client.delete_calendar
+
+#### Calendar properties update
+Update calendar properties:
+    
+    client = RubyCaldav::Client.new(uri: "http://localhost:5232/aaa/", user: "user" , password: "password")
+    properties = [{name: "d:displayname", value: "New name"}]
+    client.update_calendar(properties)
+    

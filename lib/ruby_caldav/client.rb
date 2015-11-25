@@ -169,6 +169,18 @@ module RubyCaldav
       response.code.to_i == 201
     end
 
+    def update_calendar(properties)
+      response = nil
+      build_http.start do |http|
+        request = Net::HTTP::PropPatch.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        add_auth_header(request, 'PROPPATCH')
+        request.body = RubyCaldav::Request::PropPatch.new(properties).to_xml
+        response = http.request(request)
+      end
+      handle_errors(response)
+      response.code.to_i == 200
+    end
+
     def delete_calendar
       response = nil
       build_http.start do |http|

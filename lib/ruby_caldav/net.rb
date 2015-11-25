@@ -6,6 +6,12 @@ module Net
       RESPONSE_HAS_BODY = true
     end
 
+    class PropPatch < HTTPRequest
+      METHOD = 'PROPPATCH'
+      REQUEST_HAS_BODY = true
+      RESPONSE_HAS_BODY = true
+    end
+
     class Mkcalendar < HTTPRequest
       METHOD = 'MKCALENDAR'
       REQUEST_HAS_BODY = true

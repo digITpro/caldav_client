@@ -1,7 +1,7 @@
 require 'builder'
 
 module RubyCaldav
-  NAMESPACES = {"xmlns:d" => 'DAV:', "xmlns:c" => "urn:ietf:params:xml:ns:caldav",  "xmlns:cs" => "http://calendarserver.org/ns/"}
+  NAMESPACES = {"xmlns:d" => 'DAV:', "xmlns:c" => "urn:ietf:params:xml:ns:caldav", "xmlns:cs" => "http://calendarserver.org/ns/"}
   module Request
     class Base
       def initialize
@@ -27,6 +27,27 @@ module RubyCaldav
             xml.d :prop do
               xml.d :displayname, displayname unless displayname.to_s.empty?
               xml.tag! "c:calendar-description", description, "xml:lang" => "en" unless description.to_s.empty?
+            end
+          end
+        end
+      end
+    end
+
+    class PropPatch < Base
+      attr_reader :props
+      def initialize(props, custom_namespaces = {})
+        super()
+        @props = props
+        @custom_namespaces = custom_namespaces
+      end
+
+      def to_xml
+        xml.d :propertyupdate, NAMESPACES.merge(@custom_namespaces) do
+          xml.d :set do
+            xml.d :prop do
+              props.each do |prop|
+                xml.tag! prop[:name], prop[:value]
+              end
             end
           end
         end
