@@ -13,20 +13,22 @@ module RubyCaldav
     end
 
     class Mkcalendar < Base
-      attr_accessor :displayname, :description
+      attr_accessor :displayname, :description, :color
 
-      def initialize(displayname = nil, description = nil)
+      def initialize(displayname = nil, description = nil, color = nil)
         super()
         @displayname = displayname
         @description = description
+        @color = color
       end
 
       def to_xml
-        xml.c :mkcalendar, NAMESPACES do
+        xml.c :mkcalendar, NAMESPACES.merge({ "xmlns:x" =>"http://apple.com/ns/ical/"}) do
           xml.d :set do
             xml.d :prop do
               xml.d :displayname, displayname unless displayname.to_s.empty?
               xml.tag! "c:calendar-description", description, "xml:lang" => "en" unless description.to_s.empty?
+              xml.x "x:calendar-color", color unless color.to_s.empty?
             end
           end
         end
