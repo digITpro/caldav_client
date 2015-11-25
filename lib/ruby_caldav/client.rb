@@ -57,7 +57,7 @@ module RubyCaldav
       build_http.start do |http|
         request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
         add_auth_header(request, 'REPORT')
-        request.body = RubyCaldav::Request::ReportVEVENT.new.any_events(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
+        request.body = RubyCaldav::Request::ReportVEVENT.new.all_events(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
                                                                         Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
         response = http.request(request)
       end
@@ -209,6 +209,7 @@ module RubyCaldav
       if @authentication_type != 'digest'
         request.basic_auth(@user, @password)
       else
+        p "heere"
         request.add_field('Authorization', digest_auth(method))
       end
     end
@@ -221,14 +222,14 @@ module RubyCaldav
   end
 
 
-  class AgCalDAVError < StandardError
+  class RubyCaldavError < StandardError
   end
-  class AuthenticationError < AgCalDAVError;
+  class AuthenticationError < RubyCaldavError;
   end
-  class DuplicateError < AgCalDAVError;
+  class DuplicateError < RubyCaldavError;
   end
-  class APIError < AgCalDAVError;
+  class APIError < RubyCaldavError;
   end
-  class NotExistError < AgCalDAVError;
+  class NotExistError < RubyCaldavError;
   end
 end
