@@ -204,6 +204,18 @@ module RubyCaldav
       RubyCaldav::Parser.parse_propfind(response.body)
     end
 
+    def calendar_timezone
+      response = nil
+      build_http.start do |http|
+        request = Net::HTTP::Propfind.new(@url)
+        add_auth_header(request, 'PROPFIND')
+        request.body = RubyCaldav::Request::Propfind.new.basic(["c:calendar-timezone"])
+        response = http.request(request)
+      end
+      handle_errors(response)
+      RubyCaldav::Parser.parse_propfind(response.body)["calendar-timezone"]
+    end
+
     private
 
     def digest_auth(method)

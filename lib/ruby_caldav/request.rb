@@ -120,11 +120,14 @@ module RubyCaldav
         super
       end
 
-      def basic
+      def basic(tags = [])
         xml.d :propfind, NAMESPACES do
           xml.d :prop do
             xml.d :displayname
             xml.cs :getctag
+            tags.each do |tag|
+              xml.tag! tag
+            end
           end
         end
       end
