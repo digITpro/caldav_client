@@ -18,7 +18,7 @@ module RubyCaldav
         @proxy_port = proxy_uri.port.to_i
       end
 
-      uri = URI(data[:uri])
+      uri = URI(data[:uri].end_with?('/') ? data[:uri] : "#{data[:uri]}/")
       @host = uri.host
       @port = uri.port.to_i
       @url = uri.path
@@ -100,7 +100,7 @@ module RubyCaldav
     def find_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}/#{href}")
+        request = Net::HTTP::Get.new("#{@url}#{href}")
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -124,7 +124,7 @@ module RubyCaldav
     def delete_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new("#{@url}/#{href}")
+        request = Net::HTTP::Delete.new("#{@url}#{href}")
         add_auth_header(request, 'DELETE')
         response = http.request(request)
       end
@@ -136,7 +136,7 @@ module RubyCaldav
     def save_event(href, ical_string)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Put.new("#{@url}/#{href}")
+        request = Net::HTTP::Put.new("#{@url}#{href}")
         request['Content-Type'] = 'text/calendar'
         add_auth_header(request, 'PUT')
         request.body = ical_string
@@ -149,7 +149,7 @@ module RubyCaldav
     def entry_with_uhref_exists?(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}/#{href}")
+        request = Net::HTTP::Get.new("#{@url}#{href}")
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -160,7 +160,7 @@ module RubyCaldav
     def create_calendar(identifier, display_name = nil, description = nil, color = nil)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Mkcalendar.new("#{@url}/#{identifier}/", initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Mkcalendar.new("#{@url}#{identifier}/", initheader = {'Content-Type' => 'application/xml'})
         add_auth_header(request, 'MKCALENDAR')
         request.body = RubyCaldav::Request::Mkcalendar.new(display_name, description, color).to_xml
         response = http.request(request)
