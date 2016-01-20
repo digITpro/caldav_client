@@ -1,6 +1,12 @@
 module RubyCaldav
 
   class Client
+    INIT_HEADER = {
+      "Depth" => "1",
+      "User-Agent" => "DAVKit/4.0.1 (730); CalendarStore/4.0.1 (973); iCal/4.0.1 (1374); Mac OS X/10.6.2 (10C540)",
+      "Content-Type" => "text/xml; charset='UTF-8'"
+    }.freeze
+
     attr_accessor :host, :port, :url, :user, :password, :ssl
 
     def format=(fmt)
@@ -55,7 +61,7 @@ module RubyCaldav
     def all_events(start_at, end_at)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.all_events(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
                                                                         Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
@@ -69,7 +75,7 @@ module RubyCaldav
     def find_etags(start_at = nil, end_at = nil)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
         if start_at && end_at
           request.body = RubyCaldav::Request::ReportVEVENT.new.etags(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
@@ -87,7 +93,7 @@ module RubyCaldav
     def find_events(events_href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.events(events_href)
         response = http.request(request)
@@ -100,7 +106,7 @@ module RubyCaldav
     def find_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}#{href}")
+        request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -112,7 +118,7 @@ module RubyCaldav
     def find_etag(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Report.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.etag(href)
         response = http.request(request)
@@ -124,7 +130,7 @@ module RubyCaldav
     def delete_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new("#{@url}#{href}")
+        request = Net::HTTP::Delete.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'DELETE')
         response = http.request(request)
       end
@@ -136,7 +142,7 @@ module RubyCaldav
     def save_event(href, ical_string)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Put.new("#{@url}#{href}")
+        request = Net::HTTP::Put.new("#{@url}#{href}", INIT_HEADER)
         request['Content-Type'] = 'text/calendar'
         add_auth_header(request, 'PUT')
         request.body = ical_string
@@ -149,7 +155,7 @@ module RubyCaldav
     def entry_with_uhref_exists?(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}#{href}")
+        request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
       end
@@ -160,7 +166,7 @@ module RubyCaldav
     def create_calendar(identifier, display_name = nil, description = nil, color = nil)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Mkcalendar.new("#{@url}#{identifier}/", initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::Mkcalendar.new("#{@url}#{identifier}/", INIT_HEADER)
         add_auth_header(request, 'MKCALENDAR')
         request.body = RubyCaldav::Request::Mkcalendar.new(display_name, description, color).to_xml
         response = http.request(request)
@@ -172,7 +178,7 @@ module RubyCaldav
     def update_calendar(properties, custom_namespaces = {})
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::PropPatch.new(@url, initheader = {'Content-Type' => 'application/xml'})
+        request = Net::HTTP::PropPatch.new(@url, INIT_HEADER)
         add_auth_header(request, 'PROPPATCH')
         request.body = RubyCaldav::Request::PropPatch.new(properties, custom_namespaces).to_xml
         response = http.request(request)
@@ -184,7 +190,7 @@ module RubyCaldav
     def delete_calendar
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new(@url)
+        request = Net::HTTP::Delete.new(@url, INIT_HEADER)
         add_auth_header(request, 'DELETE')
         response = http.request(request)
       end
@@ -195,7 +201,7 @@ module RubyCaldav
     def calendar_all_props
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Propfind.new(@url)
+        request = Net::HTTP::Propfind.new(@url, INIT_HEADER)
         add_auth_header(request, 'PROPFIND')
         request.body = RubyCaldav::Request::Propfind.new.basic
         response = http.request(request)
@@ -207,7 +213,7 @@ module RubyCaldav
     def calendar_timezone
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Propfind.new(@url)
+        request = Net::HTTP::Propfind.new(@url, INIT_HEADER)
         add_auth_header(request, 'PROPFIND')
         request.body = RubyCaldav::Request::Propfind.new.basic(["c:calendar-timezone"])
         response = http.request(request)
@@ -224,7 +230,7 @@ module RubyCaldav
         http.use_ssl = @ssl
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
-      request = Net::HTTP::Get.new @digest_uri.request_uri
+      request = Net::HTTP::Get.new(@digest_uri.request_uri, INIT_HEADER)
       response = http.request(request)
       @digest_auth.auth_header(@digest_uri, response['www-authenticate'], method)
     end
