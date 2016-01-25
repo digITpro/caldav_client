@@ -66,8 +66,8 @@ module RubyCaldav
         request.body = RubyCaldav::Request::ReportVEVENT.new.all_events(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
                                                                         Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
 
       RubyCaldav::Parser.parse_events(response.body)
     end
@@ -84,8 +84,8 @@ module RubyCaldav
           request.body = RubyCaldav::Request::ReportVEVENT.new.etags
         end
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
 
       RubyCaldav::Parser.parse_etags(response.body)
     end
@@ -97,8 +97,8 @@ module RubyCaldav
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.events(events_href)
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
 
       RubyCaldav::Parser.parse_events(response.body)
     end
@@ -109,8 +109,8 @@ module RubyCaldav
         request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
 
       RubyCaldav::Parser.parse_event(response.body)
     end
@@ -122,8 +122,8 @@ module RubyCaldav
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.etag(href)
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       RubyCaldav::Parser.parse_etags(response.body)
     end
 
@@ -133,8 +133,8 @@ module RubyCaldav
         request = Net::HTTP::Delete.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'DELETE')
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
 
       response.code.to_i.between?(200, 299)
     end
@@ -147,8 +147,8 @@ module RubyCaldav
         add_auth_header(request, 'PUT')
         request.body = ical_string
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       response.code.to_i == 201
     end
 
@@ -158,8 +158,8 @@ module RubyCaldav
         request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       response.code.to_i == 200
     end
 
@@ -170,8 +170,8 @@ module RubyCaldav
         add_auth_header(request, 'MKCALENDAR')
         request.body = RubyCaldav::Request::Mkcalendar.new(display_name, description, color).to_xml
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       response.code.to_i == 201
     end
 
@@ -182,8 +182,8 @@ module RubyCaldav
         add_auth_header(request, 'PROPPATCH')
         request.body = RubyCaldav::Request::PropPatch.new(properties, custom_namespaces).to_xml
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       response.code.to_i == 200
     end
 
@@ -193,8 +193,8 @@ module RubyCaldav
         request = Net::HTTP::Delete.new(@url, INIT_HEADER)
         add_auth_header(request, 'DELETE')
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       response.code.to_i == 200
     end
 
@@ -205,8 +205,8 @@ module RubyCaldav
         add_auth_header(request, 'PROPFIND')
         request.body = RubyCaldav::Request::Propfind.new.basic
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       RubyCaldav::Parser.parse_propfind(response.body)
     end
 
@@ -217,8 +217,8 @@ module RubyCaldav
         add_auth_header(request, 'PROPFIND')
         request.body = RubyCaldav::Request::Propfind.new.basic(["c:calendar-timezone"])
         response = http.request(request)
+        handle_errors(response, request)
       end
-      handle_errors(response)
       RubyCaldav::Parser.parse_propfind(response.body)["calendar-timezone"]
     end
 
@@ -239,12 +239,29 @@ module RubyCaldav
       if @authentication_type != 'digest'
         request.basic_auth(@user, @password)
       else
-        p "heere"
         request.add_field('Authorization', digest_auth(method))
       end
     end
 
-    def handle_errors(response)
+    def handle_errors(response, request)
+      if response.code.to_i.in? [401, 410, 500]
+        p '==== API error detail ===='
+        p '==== Request'
+        p "path: #{request.path}"
+        p "method: #{request.method}"
+        p 'headers:'
+        p request.to_hash.inspect
+        p 'body:'
+        p request.body.inspect
+        p '==== Response'
+        p "code: #{response.code.to_i}"
+        p "message: #{response.message.inspect}"
+        p 'header:'
+        p response.header.inspect
+        p 'body:'
+        p response.body.inspect
+        p '=========================='
+      end
       raise AuthenticationError if response.code.to_i == 401
       raise NotExistError if response.code.to_i == 410
       raise APIError if response.code.to_i >= 500
