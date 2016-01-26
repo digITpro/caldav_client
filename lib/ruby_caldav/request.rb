@@ -86,10 +86,13 @@ module RubyCaldav
         end
       end
 
-      def all_events(tstart = nil, tend = nil)
+      def all_events(tstart = nil, tend = nil, options = {})
+        options.reverse_merge!(
+          {skip_getetag: false}
+        )
         xml.c 'calendar-query'.to_sym, NAMESPACES do
           xml.d :prop do
-            xml.d :getetag
+            xml.d :getetag unless options[:skip_getetag]
             xml.c 'calendar-data'.to_sym
           end
           xml.c :filter do
@@ -102,10 +105,13 @@ module RubyCaldav
         end
       end
 
-      def events(events_href)
+      def events(events_href, options = {})
+        options.reverse_merge!(
+          {skip_getetag: false}
+        )
         xml.c 'calendar-multiget'.to_sym, NAMESPACES do
           xml.d :prop do
-            xml.d :getetag
+            xml.d :getetag unless options[:skip_getetag]
             xml.c 'calendar-data'.to_sym
           end
           events_href.each do |href|

@@ -64,7 +64,8 @@ module RubyCaldav
         request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
         request.body = RubyCaldav::Request::ReportVEVENT.new.all_events(Time.parse(start_at).utc.strftime("%Y%m%dT%H%M%S"),
-                                                                        Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"))
+                                                                        Time.parse(end_at).utc.strftime("%Y%m%dT%H%M%S"),
+                                                                        skip_getetag: true)
         response = http.request(request)
         handle_errors(response, request)
       end
@@ -95,7 +96,7 @@ module RubyCaldav
       build_http.start do |http|
         request = Net::HTTP::Report.new(@url, INIT_HEADER)
         add_auth_header(request, 'REPORT')
-        request.body = RubyCaldav::Request::ReportVEVENT.new.events(events_href)
+        request.body = RubyCaldav::Request::ReportVEVENT.new.events(events_href, skip_getetag: true)
         response = http.request(request)
         handle_errors(response, request)
       end
