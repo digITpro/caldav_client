@@ -107,7 +107,7 @@ module RubyCaldav
     def find_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
+        request = Net::HTTP::Get.new(href, INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
         handle_errors(response, request)
@@ -131,7 +131,7 @@ module RubyCaldav
     def delete_event(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Delete.new("#{@url}#{href}", INIT_HEADER)
+        request = Net::HTTP::Delete.new(href, INIT_HEADER)
         add_auth_header(request, 'DELETE')
         response = http.request(request)
         handle_errors(response, request)
@@ -143,7 +143,7 @@ module RubyCaldav
     def save_event(href, ical_string)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Put.new("#{@url}#{href}", INIT_HEADER)
+        request = Net::HTTP::Put.new(href, INIT_HEADER)
         request['Content-Type'] = 'text/calendar'
         add_auth_header(request, 'PUT')
         request.body = ical_string
@@ -156,7 +156,7 @@ module RubyCaldav
     def entry_with_uhref_exists?(href)
       response = nil
       build_http.start do |http|
-        request = Net::HTTP::Get.new("#{@url}#{href}", INIT_HEADER)
+        request = Net::HTTP::Get.new(href, INIT_HEADER)
         add_auth_header(request, 'GET')
         response = http.request(request)
         handle_errors(response, request)
