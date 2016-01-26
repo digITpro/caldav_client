@@ -244,7 +244,7 @@ module RubyCaldav
     end
 
     def handle_errors(response, request)
-      if response.code.to_i.in? [401, 410, 500]
+      if response.code.to_i.in? [401, 403, 410, 500]
         p '==== API error detail ===='
         p '==== Request'
         p "path: #{request.path}"
@@ -263,6 +263,7 @@ module RubyCaldav
         p '=========================='
       end
       raise AuthenticationError if response.code.to_i == 401
+      raise ForbiddenError if response.code.to_i == 403
       raise NotExistError if response.code.to_i == 410
       raise APIError if response.code.to_i >= 500
     end
@@ -272,6 +273,8 @@ module RubyCaldav
   class RubyCaldavError < StandardError
   end
   class AuthenticationError < RubyCaldavError;
+  end
+  class ForbiddenError < RubyCaldavError;
   end
   class DuplicateError < RubyCaldavError;
   end
