@@ -9,7 +9,7 @@ module RubyCaldav
         xml.xpath("multistatus/response").each do |response|
           href = response.xpath("href").text
           etag = response.xpath("propstat/prop/getetag").text
-          event_str = response.xpath("propstat/prop/C:calendar-data").text
+          event_str = ["calendar-data", "C:calendar-data"].map {|tag| response.xpath("propstat/prop/#{tag}").text.presence }.compact.first
           if event_str
             calendars = RiCal.parse_string(event_str)
             if calendars && (calendar = calendars.first) && (events = calendar.events)
