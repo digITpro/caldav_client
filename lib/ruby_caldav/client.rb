@@ -137,7 +137,7 @@ module RubyCaldav
         handle_errors(response, request)
       end
 
-      response.code.to_i.between?(200, 299)
+      http_success?(response)
     end
 
     def save_event(href, ical_string)
@@ -150,7 +150,7 @@ module RubyCaldav
         response = http.request(request)
         handle_errors(response, request)
       end
-      response.code.to_i == 201
+      http_success?(response)
     end
 
     def entry_with_uhref_exists?(href)
@@ -161,7 +161,7 @@ module RubyCaldav
         response = http.request(request)
         handle_errors(response, request)
       end
-      response.code.to_i == 200
+      http_success?(response)
     end
 
     def create_calendar(identifier, display_name = nil, description = nil, color = nil)
@@ -173,7 +173,7 @@ module RubyCaldav
         response = http.request(request)
         handle_errors(response, request)
       end
-      response.code.to_i == 201
+      http_success?(response)
     end
 
     def update_calendar(properties, custom_namespaces = {})
@@ -185,7 +185,7 @@ module RubyCaldav
         response = http.request(request)
         handle_errors(response, request)
       end
-      response.code.to_i == 200
+      http_success?(response)
     end
 
     def delete_calendar
@@ -196,7 +196,7 @@ module RubyCaldav
         response = http.request(request)
         handle_errors(response, request)
       end
-      response.code.to_i == 200
+      http_success?(response)
     end
 
     def calendar_all_props
@@ -244,8 +244,12 @@ module RubyCaldav
       end
     end
 
+    def http_success?(response)
+      response.code.to_i.between?(200, 299)
+    end
+
     def handle_errors(response, request)
-      if response.code.to_i >= 400
+      unless http_success?(response)
         p '==== API error detail ===='
         p '==== Request'
         p "path: #{request.path}"
