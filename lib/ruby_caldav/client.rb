@@ -270,7 +270,7 @@ module RubyCaldav
       raise AuthenticationError if response.code.to_i == 401
       raise ForbiddenError if response.code.to_i == 403
       raise NotExistError if response.code.to_i == 410
-      raise APIError if response.code.to_i >= 400
+      raise APIError if response.code.to_i != 404 && response.code.to_i >= 400
     end
   end
 
