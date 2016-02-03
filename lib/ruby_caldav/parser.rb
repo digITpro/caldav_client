@@ -7,7 +7,7 @@ module RubyCaldav
         parsed_events = []
 
         xml.xpath("multistatus/response").each do |response|
-          href = response.xpath("href").text
+          href = URI.decode(response.xpath("href").text)
           etag = response.xpath("propstat/prop/getetag").text
           event_str = ["calendar-data", "C:calendar-data"].map {|tag| response.xpath("propstat/prop/#{tag}").text.presence }.compact.first
           if event_str
@@ -36,7 +36,7 @@ module RubyCaldav
         xml = Oga.parse_xml(body)
         events_etag = []
         xml.xpath("multistatus/response").each do |response|
-          href_str = response.xpath("href").text
+          href_str = URI.decode(response.xpath("href").text)
           etag_str = response.xpath("propstat/prop/getetag").text
           events_etag << {href: href_str, etag: etag_str}
         end
