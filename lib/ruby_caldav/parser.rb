@@ -13,10 +13,11 @@ module RubyCaldav
           if event_str
             calendars = RiCal.parse_string(event_str)
             if calendars && (calendar = calendars.first) && (events = calendar.events)
-              event = events.first
-              event.add_x_property("HREF", href)
-              event.add_x_property("ETAG", etag)
-              parsed_events << event
+              events.each do |event|
+                event.add_x_property("HREF", href)
+                event.add_x_property("ETAG", etag)
+                parsed_events << event
+              end
             end
           end
         end
@@ -28,7 +29,7 @@ module RubyCaldav
         if calendars.empty?
           nil
         else
-          calendars.first.events.first
+          calendars.first.events # can returns multiple VEVENT: main event and recurrence-id events
         end
       end
 
